@@ -20,7 +20,7 @@ import os, sys
 parent_path = os.path.abspath(os.path.join(__file__, *(['..'] * 2)))
 if parent_path not in sys.path:
     sys.path.append(parent_path)
-
+from IPython import embed
 import time
 # ignore numba warning
 import warnings
@@ -67,7 +67,7 @@ def run(FLAGS, cfg, place):
 
     model.state_dict()
     print("------------------------------")
-    eval_loader, _ = create('EvalReader')(cfg.EvalDataset, 0, place)
+    eval_loader = create('EvalReader')(cfg.EvalDataset, cfg['worker_num'])
     data = next(iter(eval_loader))
     # data = [
     #         np.zeros((1, 3, 320, 320)).astype('float32'),
@@ -75,7 +75,7 @@ def run(FLAGS, cfg, place):
     #         np.zeros((1, 1)).astype('int32'),
     #         ]
     model.eval()
-    model(data, cfg['EvalReader']['inputs_def']['fields'], 'infer')
+    model(data, 'infer')
 
     # Init Model
     # model = load_dygraph_ckpt(model, ckpt=cfg.weights)
